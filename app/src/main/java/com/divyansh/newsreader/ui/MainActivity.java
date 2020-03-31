@@ -13,7 +13,9 @@ import com.divyansh.newsreader.network.APIEndpoints;
 import com.divyansh.newsreader.pojo.Article;
 import com.divyansh.newsreader.pojo.News;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,9 +29,8 @@ public class MainActivity extends AppCompatActivity {
     TextView textView;
 
     private APIEndpoints apiEndpoints;
-    private String countryCode;
-    private String category;
-    private String apiKey;
+    private String countryCode = "in";
+    private String category = "business";
     private String url;
 
     @Override
@@ -38,22 +39,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        countryCode = "in";
-        category = "business";
-        apiKey = "7eb04dd3f8df465e93fcf6cb5e3eef93";
-
-        url = String.format("top-headlines?country=%s&category=%s&apiKey=%s", countryCode, category, apiKey);
+        Map<String, String> options = new HashMap<>();
+        options.put("country", countryCode);
+        options.put("category", category);
+        options.put("apiKey", APIEndpoints.APIKEY);
 
         apiEndpoints = APIClient.getInstance().create(APIEndpoints.class);
-        Call<News> call = apiEndpoints.fetchNews("http://newsapi.org/v2/top-headlines?country=in&category=business&apiKey=7eb04dd3f8df465e93fcf6cb5e3eef93");
+        Call<News> call = apiEndpoints.fetchNews(options);
+        Log.i("Call->", call.request().url().toString());
         call.enqueue(new Callback<News>() {
             @Override
             public void onResponse(Call<News> call, Response<News> response) {
                 if (response.isSuccessful()) {
                     News news = response.body();
                     List<Article> articles = news.getArticles();
-                    textView.setText(articles.toString());
+                    textView.setText(articles.get(0).getDescription().toString());
                 } else {
+                    Log.i("Error-body->", response.raw().message());
                     Toast.makeText(getApplicationContext(), "Something happened", Toast.LENGTH_SHORT).show();
                 }
             }
