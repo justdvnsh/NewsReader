@@ -30,7 +30,7 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.newsViewsHolde
     private List<Article> Articles;
 
     public interface mContextListener {
-        void onNewsClick(News news);
+        void onNewsClick(Article article);
     }
 
     public newsAdapter(Context context, mContextListener listener, List<Article> articles) {
@@ -54,8 +54,8 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.newsViewsHolde
     @Override
     public void onBindViewHolder(@NonNull newsViewsHolder holder, int position) {
         // set up image
-        String urlToImage = Articles.get(position).getUrlToImage().toString();
-        Picasso.with(context).load(urlToImage).into(holder.image);
+        Object urlToImage = Articles.get(position).getUrlToImage();
+        if (urlToImage != null) Picasso.with(context).load(urlToImage.toString()).into(holder.image);
 
         // set up author and publish date
         Object author = Articles.get(position).getAuthor();
@@ -66,11 +66,11 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.newsViewsHolde
 
         // set up title and content
         String title = Articles.get(position).getTitle();
-        String content = Articles.get(position).getContent().toString();
-        if (content == "") content = "Nothing to show";
-        else content = content.substring(0,40) + " ... Read More";
+        Object content = Articles.get(position).getContent();
+        if (content == null || content == "") content = "Nothing to show";
+        else content = content.toString().substring(0,40) + " ... Read More";
         holder.title.setText(title);
-        holder.content.setText(content);
+        holder.content.setText(content.toString());
 
         // set up source
         String source = Articles.get(position).getSource().getName();
@@ -106,7 +106,9 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.newsViewsHolde
 
         @Override
         public void onClick(View v) {
-
+            int clickedPosition = getAdapterPosition();
+            Article article = Articles.get(clickedPosition);
+            listener.onNewsClick(article);
         }
     }
 }

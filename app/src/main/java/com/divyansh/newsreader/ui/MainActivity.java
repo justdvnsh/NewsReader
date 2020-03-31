@@ -1,12 +1,16 @@
 package com.divyansh.newsreader.ui;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -39,9 +43,11 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
 
     private newsAdapter adapter;
     private APIEndpoints apiEndpoints;
+    private final String CATEGORY = "category";
+    private final String API_KEY = "apiKey";
+    private final String COUNTRY = "country";
     private String countryCode = "in";
-    private String category = "business";
-    private String url;
+    private String category = "technology";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +55,8 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        // make the url query
-        Map<String, String> options = new HashMap<>();
-        options.put("country", countryCode);
-        options.put("category", category);
-        options.put("apiKey", APIEndpoints.APIKEY);
-
         // fetch teh news & set the progressbar's visibility.
-        getNews(options);
+        getNews(getMap(category));
         progressBar.setVisibility(View.VISIBLE);
 
         // recycler view setup
@@ -98,7 +98,46 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
     }
 
     @Override
-    public void onNewsClick(News news) {
+    public void onNewsClick(Article article) {
+        Intent intent = new Intent(this, WebViewActivity.class);
+        intent.putExtra("url", article.getUrl());
+        startActivity(intent);
+    }
 
+    private Map<String, String> getMap(String cat){
+        Map<String, String> options = new HashMap<>();
+        options.put(COUNTRY, countryCode);
+        options.put(CATEGORY, cat);
+        options.put(API_KEY, APIEndpoints.APIKEY);
+        return options;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_business:
+                category = getString(R.string.category_business).toLowerCase();
+                getNews(getMap(category));
+                break;
+            case R.id.action_sports:
+                category = getString(R.string.category_sports).toLowerCase();
+                getNews(getMap(category));
+                break;
+            case R.id.action_tech:
+                category = getString(R.string.category_tech).toLowerCase();
+                getNews(getMap(category));
+                break;
+            default: break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

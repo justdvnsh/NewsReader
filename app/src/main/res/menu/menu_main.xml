@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_business"
+        android:orderInCategory="1"
+        android:title="@string/category_business"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/action_tech"
+        android:orderInCategory="1"
+        android:title="@string/category_tech"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_sports"
+        android:orderInCategory="1"
+        android:title="@string/category_sports"
+        app:showAsAction="never" />
+</menu>
