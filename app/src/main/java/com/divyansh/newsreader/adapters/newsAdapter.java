@@ -53,8 +53,28 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.newsViewsHolde
 
     @Override
     public void onBindViewHolder(@NonNull newsViewsHolder holder, int position) {
+        // set up image
         String urlToImage = Articles.get(position).getUrlToImage().toString();
         Picasso.with(context).load(urlToImage).into(holder.image);
+
+        // set up author and publish date
+        Object author = Articles.get(position).getAuthor();
+        String pubDate = Articles.get(position).getPublishedAt();
+        if (author != null) holder.author.setText("By- " + author.toString());
+        else holder.author.setText("By- Some Author");
+        holder.date.setText("On - " + pubDate);
+
+        // set up title and content
+        String title = Articles.get(position).getTitle();
+        String content = Articles.get(position).getContent().toString();
+        if (content == "") content = "Nothing to show";
+        else content = content.substring(0,40) + " ... Read More";
+        holder.title.setText(title);
+        holder.content.setText(content);
+
+        // set up source
+        String source = Articles.get(position).getSource().getName();
+        holder.source.setText("Source- " + source);
     }
 
     @Override
