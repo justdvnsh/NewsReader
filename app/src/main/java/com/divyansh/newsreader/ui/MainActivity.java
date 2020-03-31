@@ -13,10 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.divyansh.newsreader.R;
+import com.divyansh.newsreader.adapters.newsAdapter;
 import com.divyansh.newsreader.network.APIClient;
 import com.divyansh.newsreader.network.APIEndpoints;
 import com.divyansh.newsreader.pojo.Article;
 import com.divyansh.newsreader.pojo.News;
+import com.divyansh.newsreader.pojo.Source;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,13 +30,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements newsAdapter.mContextListener{
 
     @BindView(R.id.recycle_news)
     RecyclerView recyclerView;
     @BindView(R.id.progress_main)
     ProgressBar progressBar;
 
+    private newsAdapter adapter;
     private APIEndpoints apiEndpoints;
     private String countryCode = "in";
     private String category = "business";
@@ -77,7 +80,8 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     News news = response.body();
                     List<Article> articles = news.getArticles();
-//                    textView.setText(articles.get(0).getDescription().toString());
+                    adapter = new newsAdapter(MainActivity.this, MainActivity.this, articles);
+                    recyclerView.setAdapter(adapter);
                 } else {
                     Log.i("Error-body->", response.raw().message());
                     Toast.makeText(getApplicationContext(), "Something happened", Toast.LENGTH_SHORT).show();
@@ -91,5 +95,10 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Internal Server Error", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onNewsClick(News news) {
+
     }
 }
