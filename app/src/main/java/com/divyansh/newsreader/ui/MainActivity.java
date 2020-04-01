@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.divyansh.newsreader.MyApplication;
 import com.divyansh.newsreader.R;
 import com.divyansh.newsreader.adapters.newsAdapter;
+import com.divyansh.newsreader.handlers.MyNotificationOpenHandler;
 import com.divyansh.newsreader.network.APIClient;
 import com.divyansh.newsreader.network.APIEndpoints;
 import com.divyansh.newsreader.pojo.Article;
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
 
     private List<Object> mRecyclerViewItems = new ArrayList<>();
 
-    private MyApplication myApplication;
+    private Context myApplication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +104,11 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
         RequestConfiguration configuration =
                 new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
         MobileAds.setRequestConfiguration(configuration);
+
+        // OneSignal Initialization
+//        OneSignal.startInit(this)
+//                .setNotificationOpenedHandler(new MyNotificationOpenHandler())
+//                .init();
 
     }
 

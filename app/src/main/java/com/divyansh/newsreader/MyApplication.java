@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 public class MyApplication extends Application {
 
-    private static MyApplication mInstance;
+    private static Context mInstance;
 
     public MyApplication() {
         mInstance = this;
@@ -27,31 +27,14 @@ public class MyApplication extends Application {
         super.onCreate();
         mInstance = this;
 
-
-        // load onesignal sdk
         // OneSignal Initialization
         OneSignal.startInit(this)
-                .setNotificationReceivedHandler(new ExampleNotificationReceivedHandler())
-                .setNotificationOpenedHandler(new MyNotificationOpenHandler())
+                .setNotificationOpenedHandler(new MyNotificationOpenHandler(mInstance))
                 .init();
 
     }
 
-    class ExampleNotificationReceivedHandler implements OneSignal.NotificationReceivedHandler {
-        @Override
-        public void notificationReceived(OSNotification notification) {
-            JSONObject data = notification.payload.additionalData;
-            String customKey;
-
-            if (data != null) {
-                customKey = data.optString("customkey", null);
-                if (customKey != null)
-                    Log.i("OneSignalExample", "customkey set with value: " + customKey);
-            }
-        }
-    }
-
-    public static MyApplication getInstance() {
+    public static Context getInstance() {
         return mInstance;
     }
 }

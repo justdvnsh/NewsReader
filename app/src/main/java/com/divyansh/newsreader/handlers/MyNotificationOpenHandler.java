@@ -1,10 +1,10 @@
 package com.divyansh.newsreader.handlers;
 
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.divyansh.newsreader.MyApplication;
 import com.divyansh.newsreader.ui.MainActivity;
 import com.divyansh.newsreader.ui.WebViewActivity;
 import com.onesignal.OSNotificationAction;
@@ -14,6 +14,13 @@ import com.onesignal.OneSignal;
 import org.json.JSONObject;
 
 public class MyNotificationOpenHandler implements OneSignal.NotificationOpenedHandler {
+    
+    private Context context;
+    
+    public MyNotificationOpenHandler(Context context){
+        this.context = context;
+    }
+    
     // This fires when a notification is opened by tapping on it.
     @Override
     public void notificationOpened(OSNotificationOpenResult result) {
@@ -30,18 +37,19 @@ public class MyNotificationOpenHandler implements OneSignal.NotificationOpenedHa
             activityToBeOpened = data.optString("activityToBeOpened", null);
             if (activityToBeOpened != null && activityToBeOpened.equals("AnotherActivity")) {
                 Log.i("OneSignalExample", "customkey set with value: " + activityToBeOpened);
-                Intent intent = new Intent(MyApplication.getInstance(), WebViewActivity.class);
+                Intent intent = new Intent(context, WebViewActivity.class);
+                intent.putExtra("url", data.optString("url"));
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
-                MyApplication.getInstance().startActivity(intent);
+                context.startActivity(intent);
             } else if (activityToBeOpened != null && activityToBeOpened.equals("MainActivity")) {
                 Log.i("OneSignalExample", "customkey set with value: " + activityToBeOpened);
-                Intent intent = new Intent(MyApplication.getInstance(), MainActivity.class);
+                Intent intent = new Intent(context, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
-                MyApplication.getInstance().startActivity(intent);
+                context.startActivity(intent);
             } else {
-                Intent intent = new Intent(MyApplication.getInstance(), MainActivity.class);
+                Intent intent = new Intent(context, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
-                MyApplication.getInstance().startActivity(intent);
+                context.startActivity(intent);
             }
 
         }
@@ -51,9 +59,9 @@ public class MyNotificationOpenHandler implements OneSignal.NotificationOpenedHa
         if (actionType == OSNotificationAction.ActionType.ActionTaken) {
             Log.i("OneSignalExample", "Button pressed with id: " + result.action.actionID);
             if (result.action.actionID.equals("ActionOne")) {
-                Toast.makeText(MyApplication.getInstance(), "ActionOne Button was pressed", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "ActionOne Button was pressed", Toast.LENGTH_LONG).show();
             } else if (result.action.actionID.equals("ActionTwo")) {
-                Toast.makeText(MyApplication.getInstance(), "ActionTwo Button was pressed", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "ActionTwo Button was pressed", Toast.LENGTH_LONG).show();
             }
         }
     }
