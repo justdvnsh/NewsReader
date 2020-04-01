@@ -93,7 +93,8 @@ public class newsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 String title = article.getTitle();
                 Object content = article.getContent();
                 if (content == null || content == "") content = "Nothing to show";
-                else content = content.toString().substring(0,40) + " ... Read More";
+                else if ( content.toString().length() < 40 )content = content + " ... Read More";
+                else content = content.toString().substring(0,40) + " ...Read More";
                 newsViewsHolder.title.setText(title);
                 newsViewsHolder.content.setText(content.toString());
 

@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.divyansh.newsreader.MyApplication;
 import com.divyansh.newsreader.R;
 import com.divyansh.newsreader.adapters.newsAdapter;
 import com.divyansh.newsreader.network.APIClient;
@@ -40,6 +41,7 @@ import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.onesignal.OneSignal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,11 +81,14 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
 
     private List<Object> mRecyclerViewItems = new ArrayList<>();
 
+    private MyApplication myApplication;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        myApplication = MyApplication.getInstance();
 
         // fetch teh news & set the progressbar's visibility.
         getNews(getMap(category));
@@ -98,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
         RequestConfiguration configuration =
                 new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
         MobileAds.setRequestConfiguration(configuration);
-
 
     }
 
@@ -217,14 +221,17 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
         switch (id) {
             case R.id.action_business:
                 category = getString(R.string.category_business).toLowerCase();
+                mRecyclerViewItems = new ArrayList<>();
                 getNews(getMap(category));
                 break;
             case R.id.action_sports:
                 category = getString(R.string.category_sports).toLowerCase();
+                mRecyclerViewItems = new ArrayList<>();
                 getNews(getMap(category));
                 break;
             case R.id.action_tech:
                 category = getString(R.string.category_tech).toLowerCase();
+                mRecyclerViewItems = new ArrayList<>();
                 getNews(getMap(category));
                 break;
             default: break;
