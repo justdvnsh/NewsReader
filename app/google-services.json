@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "700989616069",
+    "firebase_url": "https://news-reader-ab01a.firebaseio.com",
+    "project_id": "news-reader-ab01a",
+    "storage_bucket": "news-reader-ab01a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700989616069:android:81f4c1756eb52b317f65ac",
+        "android_client_info": {
+          "package_name": "com.divyansh.newsreader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "700989616069-1eugo1d7hbdnb27dcj1vgbf13ehvcnqm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.divyansh.newsreader",
+            "certificate_hash": "36d63351aea5b30a72c88b933c89aea5d05ef616"
+          }
+        },
+        {
+          "client_id": "700989616069-se39tqnj2uekourvpmdqatiklp854ufk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmqT0acycCS2LnY1rw5IT_riUlH_QdcTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "700989616069-se39tqnj2uekourvpmdqatiklp854ufk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-7888506497709570~4864315574"
+    }
+  ],
+  "configuration_version": "1"
+}

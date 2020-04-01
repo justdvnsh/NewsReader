@@ -29,20 +29,16 @@ import com.divyansh.newsreader.network.APIClient;
 import com.divyansh.newsreader.network.APIEndpoints;
 import com.divyansh.newsreader.pojo.Article;
 import com.divyansh.newsreader.pojo.News;
-import com.divyansh.newsreader.pojo.Source;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.NativeExpressAdView;
 import com.google.android.gms.ads.RequestConfiguration;
-import com.google.android.gms.ads.formats.MediaView;
-import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
-import com.google.android.gms.ads.formats.UnifiedNativeAdView;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.onesignal.OneSignal;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
     private String category = "technology";
 
     // The number of native ads to load and display.
-    public static final int NUMBER_OF_ADS = 6;
+    public static final int NUMBER_OF_ADS = 3;
 
     // The AdLoader used to load ads.
     private AdLoader adLoader;
@@ -83,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
     private List<Object> mRecyclerViewItems = new ArrayList<>();
 
     private Context myApplication;
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,12 +101,40 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
         RequestConfiguration configuration =
                 new RequestConfiguration.Builder().setTestDeviceIds(testDeviceIds).build();
         MobileAds.setRequestConfiguration(configuration);
+        MobileAds.initialize(this, "ca-app-pub-7888506497709570~4864315574");
 
-        // OneSignal Initialization
-//        OneSignal.startInit(this)
-//                .setNotificationOpenedHandler(new MyNotificationOpenHandler())
-//                .init();
+        // firebase remote config initialization
+        intializeFirebaseRemoteConfig();
+    }
 
+    private void intializeFirebaseRemoteConfig() {
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(3600)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
+        mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_default);
+
+
+    // fetch
+        mFirebaseRemoteConfig.fetch(3600)
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(MainActivity.this, "Fetch Succeeded",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Fetch Failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        doWhatever();
+                    }
+                });
+    }
+
+    private void doWhatever() {
+        Log.i("FirebaseREMOTECONFIG", mFirebaseRemoteConfig.getString("welcome_message"));
     }
 
 
