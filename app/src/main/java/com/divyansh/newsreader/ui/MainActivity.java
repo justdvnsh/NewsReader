@@ -1,12 +1,23 @@
 package com.divyansh.newsreader.ui;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -16,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,8 +46,10 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -43,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -51,23 +66,28 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements newsAdapter.mContextListener{
+public class MainActivity extends AppCompatActivity implements newsAdapter.mContextListener, LocationListener {
 
     @BindView(R.id.recycle_news)
     RecyclerView recyclerView;
     @BindView(R.id.progress_main)
     ProgressBar progressBar;
+    @BindView(R.id.error_layout)
+    LinearLayout errorLayout;
 
     private newsAdapter adapter;
     private APIEndpoints apiEndpoints;
     private final String CATEGORY = "category";
     private final String API_KEY = "apiKey";
     private final String COUNTRY = "country";
-    private String countryCode = "in";
+    private String countryCode = "";
     private String category = "technology";
 
     // The number of native ads to load and display.
     public static final int NUMBER_OF_ADS = 3;
+
+    // final int for location permissions
+    public static final int LOCATION_PERMISSION = 10;
 
     // The AdLoader used to load ads.
     private AdLoader adLoader;
@@ -79,6 +99,30 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
 
     private Context myApplication;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
+    private LocationManager locationManager;
+
+    // check permissions
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION) {
+            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                // Granted. Start getting the location information
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
+
+                    try {
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10, 10, this);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }  else {
+                errorLayout.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), "Cannot fetch location", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,9 +131,17 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
         ButterKnife.bind(this);
         myApplication = MyApplication.getInstance();
 
-        // fetch teh news & set the progressbar's visibility.
-        getNews(getMap(category));
-        progressBar.setVisibility(View.VISIBLE);
+        // setup location manager & check permissions
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION);
+        } else {
+            try {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10, 10, this);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         // recycler view setup
         setupRecyclerView();
@@ -233,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
         startActivity(intent);
     }
 
-    private Map<String, String> getMap(String cat){
+    private Map<String, String> getMap(String countryCode, String cat){
         Map<String, String> options = new HashMap<>();
         options.put(COUNTRY, countryCode);
         options.put(CATEGORY, cat);
@@ -255,21 +307,70 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
             case R.id.action_business:
                 category = getString(R.string.category_business).toLowerCase();
                 mRecyclerViewItems = new ArrayList<>();
-                getNews(getMap(category));
+                if (countryCode != "") {
+                    getNews(getMap(countryCode, category));
+                }
                 break;
             case R.id.action_sports:
                 category = getString(R.string.category_sports).toLowerCase();
                 mRecyclerViewItems = new ArrayList<>();
-                getNews(getMap(category));
+                if (countryCode != "") {
+                    getNews(getMap(countryCode, category));
+                }
                 break;
             case R.id.action_tech:
                 category = getString(R.string.category_tech).toLowerCase();
                 mRecyclerViewItems = new ArrayList<>();
-                getNews(getMap(category));
+                if (countryCode != "") {
+                    getNews(getMap(countryCode, category));
+                }
                 break;
             default: break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void getCountryCodeAndFetchNews(LatLng latLng) {
+
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+        try {
+
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+
+            if ( addresses != null && addresses.size() > 0 ) {
+
+                countryCode = addresses.get(0).getCountryCode();
+                Log.i("Address", countryCode);
+                // fetch teh news & set the progressbar's visibility.
+                getNews(getMap(countryCode, category));
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        getCountryCodeAndFetchNews(new LatLng(location.getLatitude(), location.getLongitude()));
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

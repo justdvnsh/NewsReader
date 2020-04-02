@@ -6,6 +6,35 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
+    <LinearLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/error_layout"
+        android:padding="10dp"
+        android:visibility="gone"
+        >
+
+        <ImageView
+            android:layout_height="0dp"
+            android:layout_weight="8"
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_anxiety"
+            />
+
+        <TextView
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:layout_width="wrap_content"
+            android:text="We Cannot tune your feed without location."
+            android:textStyle="bold"
+            android:textSize="26sp"
+            android:layout_gravity="center"
+            />
+
+    </LinearLayout>
+
     <ProgressBar
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
