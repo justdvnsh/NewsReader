@@ -17,14 +17,9 @@ any link through push notif, when clicked on it opens in the webview
 
 ## Screenshots
 ---
-![Location Permission](docs/1.jpg)
-![Denying the permission](docs/2.jpg)
-![Accepting the permissions](docs/3.jpg)
-![Opening a news](docs/4.jpg)
-![Changing the category to choose from - Tech, Sports, Business](docs/5.jpg)
-![notifications when app is in background/closed ](docs/6.jpg)
-![notifications when app is in foreground](docs/7.jpg)
-![ads when enabled from firebase remote config](docs/8.jpg)
-
+|![Location Permission](docs/1.jpg)|![Error Screen](docs/2.jpg)|![News Layout](docs/3.jpg)| 
+|---|---|---|
+|![On Cliking any news](docs/4.jpg)|![Changing the category](docs/5.jpg)|![Notifications - background](docs/6.jpg)| 
+|![Notifications - foreground](docs/7.jpg)|![Ads Enabled from firebase remote config](docs/8.jpg)|
 ---
 
