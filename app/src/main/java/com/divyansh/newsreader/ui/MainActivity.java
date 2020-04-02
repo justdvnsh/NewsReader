@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
                 .setMinimumFetchIntervalInSeconds(1000)
+                .setDeveloperModeEnabled(true)
                 .build();
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
         mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_default);
