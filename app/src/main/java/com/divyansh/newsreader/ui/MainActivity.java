@@ -2,7 +2,6 @@ package com.divyansh.newsreader.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -110,31 +109,31 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
     private void intializeFirebaseRemoteConfig() {
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(3600)
+                .setMinimumFetchIntervalInSeconds(1000)
                 .build();
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
         mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_default);
-
-
-    // fetch
-        mFirebaseRemoteConfig.fetch(3600)
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "Fetch Succeeded",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(MainActivity.this, "Fetch Failed",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        doWhatever();
-                    }
-                });
+        fetchAdsShowcase();
     }
 
-    private void doWhatever() {
-        Log.i("FirebaseREMOTECONFIG", mFirebaseRemoteConfig.getString("welcome_message"));
+    private void fetchAdsShowcase() {
+        Log.i("FIREBASE_REMOTE_ADS", mFirebaseRemoteConfig.getString("ads_enabled"));
+//        Toast.makeText(this, mFirebaseRemoteConfig.getString("ads_enabled"), Toast.LENGTH_SHORT).show();
+        mFirebaseRemoteConfig.fetchAndActivate()
+                .addOnCompleteListener(this, new OnCompleteListener<Boolean>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Boolean> task) {
+                        if (task.isSuccessful()) {
+                            boolean updated = task.getResult();
+                            Log.i("FIREBASE_REMOTE_CONFIG", "Config params updated: " + updated);
+//                            Toast.makeText(MainActivity.this, "Fetch and activate succeeded",
+//                                    Toast.LENGTH_SHORT).show();
+                        } else {
+//                            Toast.makeText(MainActivity.this, "Fetch failed",
+//                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
 
@@ -206,7 +205,9 @@ public class MainActivity extends AppCompatActivity implements newsAdapter.mCont
                     }
 
                     // load ads
-                    loadNativeAds();
+                    if (mFirebaseRemoteConfig.getString("ads_enabled").equals("true")) {
+                        loadNativeAds();
+                    }
                     adapter = new newsAdapter(MainActivity.this, MainActivity.this, mRecyclerViewItems);
                     recyclerView.setAdapter(adapter);
                 } else {

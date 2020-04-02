@@ -1,0 +1,2 @@
+com/google/firebase/provider/FirebaseInitProvider.class
+com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar
